@@ -14,8 +14,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
+      - name: Locate project
+        id: p
+        run: echo "dir=$(dirname "$(find . -name settings.gradle.kts -not -path './.git/*' | head -1)")" >> "$GITHUB_OUTPUT"
       - run: gradle :app:assembleDebug --no-daemon --stacktrace
+        working-directory: ${{ steps.p.outputs.dir }}
       - uses: actions/upload-artifact@v4
         with:
           name: SafeDrop-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: ${{ steps.p.outputs.dir }}/app/build/outputs/apk/debug/*.apk
